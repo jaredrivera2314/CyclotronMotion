@@ -1,1 +1,2 @@
-*Hello
+import numpy
+x = 5
