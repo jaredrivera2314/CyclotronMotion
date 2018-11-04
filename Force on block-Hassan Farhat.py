@@ -33,7 +33,7 @@ for i in range(0, n):
     x.append(i)
     xRHS.append(i)
     xLHS.append(i)
-    v[i]= a*dt
+    v[i]= a*t[i]
     t[i]=i
     
     if i == 0:
@@ -50,7 +50,7 @@ for i in range(0, n):
         x[i] = (0.5)*(xRHS[i] + xLHS[i])
         
 #Plot the graph of time and position
-plt.plot(x,t)
-plt.xlabel('Position')
-plt.ylabel('Time')
+plt.plot(t,x)
+plt.xlabel('Time')
+plt.ylabel('Position')
 plt.title('Force on a box')
