@@ -51,20 +51,20 @@ def a( q_over_m, r, v ):
 	global count, jumps                # if you use the global statement, the variable will become available 
 	if jumps >= jumps_max:			# "outside" the scope of the function, effectively becoming a global variable
 		# No acceleration
-		a = 0.0
-	elif r[0] >= 0 or r[0] <= -gap_size:
+		a = 0.0						#Finishes the cyclotron motion
+	elif r[0] >= 0 or r[0] <= -gap_size:		#Outside gap, subject to magnetic field
 		a = np.cross(v, b) 
 		a = a * q_over_m
-		if count:
-			jumps += 1
-			velo[jumps] = np.linalg.norm(v)
-			count = 0
-	else: 	
+		if count!=0:						
+			jumps += 1							#Effectively gives us a way to add to the jump variable only when the particle crosses the E field to B field threshold
+			velo[jumps] = np.linalg.norm(v)		#Unnecessary to the plot, but so far allows us to get the final velocity using the print function at the bottom of the code
+			count = 0							# Set to 0 so that we only add to the jump variable once
+	else: 										#Inside gap, subject to electric field
 		a = np.array(e)	
 		a = a * q_over_m
-		if r[1] > 0:
+		if r[1] > 0:							#Reverses acceleration direction so that the particle does not decelerate 'round the circle
 			a = -a
-		count += 1
+		count = 1
 	return a
 
 
@@ -83,21 +83,18 @@ velo[0] = np.linalg.norm(proton.vel)
 
 
 def rk4(particle, iterations, desired_value):
-
+	global n, h, jumps
 	RK4_pos = []
 	RK4_vel = []
 	
-	
-	
-	n = 400
+	n=400
 	h = particle.period() / n
 	q_over_m = particle.charge / particle.mass
 	
 	p_0 = np.array(particle.pos) 
 	v_0 = np.array(particle.vel) 
 	
-	for i in range(iterations + 10):
-		i += 1
+	for i in range(iterations):
 		p_i = p_0
 		v_i = v_0
 	
@@ -128,6 +125,7 @@ def rk4(particle, iterations, desired_value):
 		elif desired_value == 'position': 
 			RK4_pos.append(p_0)
 			value = RK4_pos
+	jumps=0
 	
 		
 	return value
@@ -198,8 +196,6 @@ def position_plot(particle):
 
 
 def velocity_plot(particle):
-	n = 400
-	h = particle.period() / n
 	
 	v = rk4(proton , 10000 ,'velocity')	
 	t = np.linspace(0, len(v) * h, len(v))
@@ -238,10 +234,26 @@ def vel_rad_plot(particle):
 
 
 velocity_plot(proton)
-jumps = 0 
 position_plot(proton)
 vel_rad_plot(proton)
 plt.show()
 
 
 
+#################################################################################################################################################
+# Goals #########################################################################################################################################
+#################################################################################################################################################
+# 1. Replacing the count variable with a simpler method of adding to the number of jumps?
+#
+#
+#
+##################################################################################################################################################
+# Changelog ######################################################################################################################################
+##################################################################################################################################################
+# 1. Adjusted count variable to be less obtuse, instead functioning as a simple boolean
+# 2. Removed a redundant assignment to i in the RK4's for loop
+# 3. Made n and h global variables, so that defining them isn't required for the other functions
+# 4. Removed a redundant +10 to the iterations in the RK4 for loop
+# 5. Reset the jump variable to 0 at the end of the RK4 function so that it may be called again without having to reset the variable manually as
+# before, deleted the associated assignement at the bottom of the code
+#
