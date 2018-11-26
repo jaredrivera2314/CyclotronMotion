@@ -46,6 +46,7 @@ jumps = 0
 jumps_max = 46
 count = 0
 
+<<<<<<< HEAD
 
 def a(q_over_m, r, v):
     global count, jumps  # if you use the global statement, the variable will become available
@@ -66,6 +67,27 @@ def a(q_over_m, r, v):
             a = -a
         count += 1
     return a
+=======
+def a( q_over_m, r, v ):
+	global count, jumps                # if you use the global statement, the variable will become available 
+	if jumps >= jumps_max:			# "outside" the scope of the function, effectively becoming a global variable
+		# No acceleration
+		a = 0.0						#Finishes the cyclotron motion
+	elif r[0] >= 0 or r[0] <= -gap_size:		#Outside gap, subject to magnetic field
+		a = np.cross(v, b) 
+		a = a * q_over_m
+		if count!=0:						
+			jumps += 1							#Effectively gives us a way to add to the jump variable only when the particle crosses the E field to B field threshold
+			velo[jumps] = np.linalg.norm(v)		#Unnecessary to the plot, but so far allows us to get the final velocity using the print function at the bottom of the code
+			count = 0							# Set to 0 so that we only add to the jump variable once
+	else: 										#Inside gap, subject to electric field
+		a = np.array(e)	
+		a = a * q_over_m
+		if r[1] > 0:							#Reverses acceleration direction so that the particle does not decelerate 'round the circle
+			a = -a
+		count = 1
+	return a
+>>>>>>> 5bacee0b38cd0ee6c6e87dbbe141f04bc08d3d37
 
 
 ###############################################################################
@@ -82,6 +104,7 @@ velo[0] = np.linalg.norm(proton.vel)
 
 
 def rk4(particle, iterations, desired_value):
+<<<<<<< HEAD
     RK4_pos = []
     RK4_vel = []
 
@@ -122,6 +145,55 @@ def rk4(particle, iterations, desired_value):
 
     return value
 
+=======
+	global n, h, jumps
+	RK4_pos = []
+	RK4_vel = []
+	
+	n=400
+	h = particle.period() / n
+	q_over_m = particle.charge / particle.mass
+	
+	p_0 = np.array(particle.pos) 
+	v_0 = np.array(particle.vel) 
+	
+	for i in range(iterations):
+		p_i = p_0
+		v_i = v_0
+	
+		k1 = h * a( q_over_m, p_i, v_i )
+		l1 = h * v_i
+		
+		
+		k2 = h * a( q_over_m, p_0 + (l1 * 0.5), v_0 + (k1 * 0.5) )
+		l2 = h * (v_0 + (k1 * 0.5))
+		
+
+		k3 = h * a( q_over_m, p_0 + (l2 * 0.5), v_0 + (k2 * 0.5) )
+		l3 = h * (v_0 + (k2 * 0.5))
+	
+		k4 = h * a( q_over_m, p_0 + l3, v_0 + k3 )
+		l4 = h * (v_0 + k3)
+		
+
+		v_0 = v_0 + (k1 + 2.0 * (k2 + k3) + k4) / 6.0
+		p_0 = p_0 + (l1 + 2.0 * (l2 + l3) + l4) / 6.0
+	
+		
+		
+		if desired_value == 'velocity': 
+			vel_mag = np.linalg.norm(v_0)
+			RK4_vel.append(vel_mag)
+			value = RK4_vel
+		elif desired_value == 'position': 
+			RK4_pos.append(p_0)
+			value = RK4_pos
+	jumps=0
+	
+		
+	return value
+	
+>>>>>>> 5bacee0b38cd0ee6c6e87dbbe141f04bc08d3d37
 
 #######################################################################################
 #  
@@ -183,6 +255,7 @@ def position_plot(particle):
 
 
 def velocity_plot(particle):
+<<<<<<< HEAD
     n = 400
     h = particle.period() / n
 
@@ -200,6 +273,24 @@ def velocity_plot(particle):
     final_t = t[len(velo) - 1]
     print(final_t)
 
+=======
+	
+	v = rk4(proton , 10000 ,'velocity')	
+	t = np.linspace(0, len(v) * h, len(v))
+	
+	
+	coordlabel = ["Time (s)","Velocity (m/s)","Z-axis (m)"]
+	plot(coordlabel, "Beam Velocity as a Function of Time", '2d', t,v)
+	
+
+	#prints final velocity
+	final_velo = velo[len(velo) - 1]
+	print (final_velo)
+
+	#prints final time
+	final_t = t[len(velo) - 1]
+	print (final_t)
+>>>>>>> 5bacee0b38cd0ee6c6e87dbbe141f04bc08d3d37
 
 ###############################################################################
 #  
@@ -219,7 +310,33 @@ def vel_rad_plot(particle):
 
 
 velocity_plot(proton)
+<<<<<<< HEAD
 jumps = 0
 position_plot(proton)
 vel_rad_plot(proton)
 plt.show()
+=======
+position_plot(proton)
+vel_rad_plot(proton)
+plt.show()
+
+
+
+#################################################################################################################################################
+# Goals #########################################################################################################################################
+#################################################################################################################################################
+# 1. Replacing the count variable with a simpler method of adding to the number of jumps?
+#
+#
+#
+##################################################################################################################################################
+# Changelog ######################################################################################################################################
+##################################################################################################################################################
+# 1. Adjusted count variable to be less obtuse, instead functioning as a simple boolean
+# 2. Removed a redundant assignment to i in the RK4's for loop
+# 3. Made n and h global variables, so that defining them isn't required for the other functions
+# 4. Removed a redundant +10 to the iterations in the RK4 for loop
+# 5. Reset the jump variable to 0 at the end of the RK4 function so that it may be called again without having to reset the variable manually as
+# before, deleted the associated assignement at the bottom of the code
+#
+>>>>>>> 5bacee0b38cd0ee6c6e87dbbe141f04bc08d3d37

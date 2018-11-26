@@ -288,7 +288,7 @@ def vel_rad_plot(particle):
 
 # 
 # velocity_plot(proton)
-# jumps = 0 
+# jumps = 0
 #position_plot(proton)
 print(rk4(proton , 40032 ,'position')[10])
 # # vel_rad_plot(proton)
