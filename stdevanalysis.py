@@ -25,7 +25,7 @@ ax2.set_ylabel('stdev', color=color)
 ax2.plot(n, stdev, color=color)
 ax2.tick_params(axis='y', labelcolor=color)
 
-fig.tight_layout()  
+fig.tight_layout()
 plt.show()
 
 
